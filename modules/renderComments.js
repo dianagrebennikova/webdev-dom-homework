@@ -11,7 +11,7 @@ export function renderComments() {
     commentsList.innerHTML += `
       <li class="comment" data-index="${index}">
         <div class="comment-header">
-          <div>${comment.name}</div>
+          <div>${comment.author.name}</div>
           <div>${comment.date}</div>
         </div>
         <div class="comment-body">
