@@ -2,6 +2,7 @@ import { comments } from "./commentsArr.js";
 import { sanitizeHTML } from "./sanitize.js";
 import { addLikeListeners } from "./addLikeListener.js";
 import { addReplyListeners } from "./addReplyListener.js";
+import { getCurrentFormattedDate } from "./getDate.js";
 
 export function renderComments() {
   const commentsList = document.querySelector(".comments");
@@ -12,7 +13,7 @@ export function renderComments() {
       <li class="comment" data-index="${index}">
         <div class="comment-header">
           <div>${comment.author.name}</div>
-          <div>${comment.date}</div>
+          <div>${getCurrentFormattedDate(comment.date)}</div>
         </div>
         <div class="comment-body">
           <div class="comment-text">${sanitizeHTML(comment.text)}</div>
