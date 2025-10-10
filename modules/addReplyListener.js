@@ -8,7 +8,7 @@ export function addReplyListeners() {
     el.addEventListener("click", () => {
       const index = el.dataset.index;
       const comment = comments[index];
-      commentInput.value = `Ответ на комментарий: "${comment.name}: ${comment.text}"\n`;
+      commentInput.value = `Ответ на комментарий: "${comment.author.name}: ${comment.text}"\n`;
     });
   });
 }

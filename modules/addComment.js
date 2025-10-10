@@ -1,6 +1,4 @@
-import { comments } from "./commentsArr.js";
-import { getCurrentFormattedDate } from "./getDate.js";
-import { renderComments } from "./renderComments.js";
+import { postComment } from "./api.js";
 
 export function addComment() {
   const nameInput = document.querySelector(".add-form-name");
@@ -9,21 +7,13 @@ export function addComment() {
   const name = nameInput.value.trim();
   const comment = commentInput.value.trim();
 
-  if (!name || !comment) {
-    alert("Пожалуйста, введите имя и комментарий.");
+  if (name.length < 3 || comment.length < 3) {
+    alert("Имя и комментарий должны быть не короче 3 символов");
     return;
   }
 
-  comments.push({
-    name,
-    date: getCurrentFormattedDate(),
-    text: comment,
-    likes: 0,
-    isLiked: false,
-  });
+  postComment(name, comment);
 
   nameInput.value = "";
   commentInput.value = "";
-
-  renderComments();
 }

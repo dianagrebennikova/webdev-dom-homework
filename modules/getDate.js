@@ -1,5 +1,5 @@
-export function getCurrentFormattedDate() {
-  const now = new Date();
+export function getCurrentFormattedDate(dateString) {
+  const now = new Date(dateString);
   const day = String(now.getDate()).padStart(2, "0");
   const month = String(now.getMonth() + 1).padStart(2, "0");
   const year = String(now.getFullYear()).slice(-2);
