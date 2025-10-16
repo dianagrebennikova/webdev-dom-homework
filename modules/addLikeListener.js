@@ -1,5 +1,6 @@
 import { comments } from "./commentsArr.js";
 import { renderComments } from "./renderComments.js";
+import { delay } from "./delay.js";
 
 export function addLikeListeners() {
   const likeButtons = document.querySelectorAll(".like-button");
@@ -10,10 +11,15 @@ export function addLikeListeners() {
       const index = button.dataset.index;
       const comment = comments[index];
 
-      comment.isLiked = !comment.isLiked;
-      comment.likes += comment.isLiked ? 1 : -1;
+      comment.isLikeLoading = true;
 
       renderComments();
+      delay(2000).then(() => {
+        comment.likes = comment.isLiked ? comment.likes - 1 : comment.likes + 1;
+        comment.isLiked = !comment.isLiked;
+        comment.isLikeLoading = false;
+        renderComments();
+      });
     });
   });
 }
