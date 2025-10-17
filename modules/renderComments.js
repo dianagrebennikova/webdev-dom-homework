@@ -12,7 +12,7 @@ export function renderComments() {
     commentsList.innerHTML += `
       <li class="comment" data-index="${index}">
         <div class="comment-header">
-          <div>${comment.author.name}</div>
+          <div>${sanitizeHTML(comment.author.name)}</div>
           <div>${getCurrentFormattedDate(comment.date)}</div>
         </div>
         <div class="comment-body">
