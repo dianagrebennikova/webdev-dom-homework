@@ -1,24 +1,23 @@
 import { updateComments } from "./commentsArr.js";
 import { renderComments } from "./renderComments.js";
 
-export function fetchComments() {
-  const commentsList = document.querySelector(".comments");
-  let loaderTimeout;
+let isFirstLoad = true;
 
-  loaderTimeout = setTimeout(() => {
+export function fetchComments() {
+  if (isFirstLoad) {
+    const commentsList = document.querySelector(".comments");
     commentsList.innerHTML = `<li>Загрузка комментариев...</li>`;
-  }, 500);
+    isFirstLoad = false;
+  }
 
   return fetch("https://wedev-api.sky.pro/api/v1/grebennikova-diana/comments")
     .then((response) => response.json())
     .then((data) => {
-      clearTimeout(loaderTimeout);
       updateComments(data.comments);
       renderComments();
     })
     .catch((error) => {
-      clearTimeout(loaderTimeout);
-      commentsList.innerHTML = `<li>Ошибка: ${error.message}</li>`;
+      alert("Ошибка загрузки комментариев: " + error.message);
     });
 }
 
