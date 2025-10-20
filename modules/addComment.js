@@ -3,6 +3,7 @@ import { postComment } from "./api.js";
 export function addComment() {
   const nameInput = document.querySelector(".add-form-name");
   const commentInput = document.querySelector(".add-form-text");
+  const submitButton = document.querySelector(".add-form-button");
 
   const name = nameInput.value.trim();
   const comment = commentInput.value.trim();
@@ -12,8 +13,19 @@ export function addComment() {
     return;
   }
 
-  postComment(name, comment);
+  submitButton.disabled = true;
+  submitButton.textContent = "Отправка...";
 
-  nameInput.value = "";
-  commentInput.value = "";
+  postComment(name, comment)
+    .then(() => {
+      nameInput.value = "";
+      commentInput.value = "";
+    })
+    .catch((err) => {
+      alert("Ошибка отправки: ", err.message);
+    })
+    .finally(() => {
+      submitButton.disabled = false;
+      submitButton.textContent = "Отправить";
+    });
 }

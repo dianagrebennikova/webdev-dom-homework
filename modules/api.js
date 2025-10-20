@@ -1,7 +1,15 @@
 import { updateComments } from "./commentsArr.js";
 import { renderComments } from "./renderComments.js";
 
+let isFirstLoad = true;
+
 export function fetchComments() {
+  if (isFirstLoad) {
+    const commentsList = document.querySelector(".comments");
+    commentsList.innerHTML = `<li>Загрузка комментариев...</li>`;
+    isFirstLoad = false;
+  }
+
   return fetch("https://wedev-api.sky.pro/api/v1/grebennikova-diana/comments")
     .then((response) => response.json())
     .then((data) => {
