@@ -11,13 +11,24 @@ export function fetchComments() {
   }
 
   return fetch("https://wedev-api.sky.pro/api/v1/grebennikova-diana/comments")
-    .then((response) => response.json())
+    .then((response) => {
+      if (!response.ok) {
+        if (response.status >= 500) {
+          throw new Error("Ошибка сервера. Попробуйте позже");
+        }
+      }
+      return response.json();
+    })
     .then((data) => {
       updateComments(data.comments);
       renderComments();
     })
     .catch((error) => {
-      alert("Ошибка загрузки комментариев: " + error.message);
+      if (error.message === "Failed to fetch") {
+        alert("Проверьте интернет соединение");
+      } else {
+        alert("Ошибка загрузки комментариев" + error.message);
+      }
     });
 }
 
@@ -27,15 +38,27 @@ export function postComment(name, text) {
     body: JSON.stringify({
       name,
       text,
+      forceError: true,
     }),
   })
     .then((response) => {
       if (!response.ok) {
-        return response.json().then((err) => {
-          throw new Error(err.error);
-        });
+        if (response.status === 400) {
+          return response.json().then((err) => {
+            throw new Error("Неккоректный запрос" + err.error);
+          });
+        }
+        if (response.status === 500) {
+          throw new Error("Ошибка сервера");
+        }
       }
       return response.json();
     })
-    .then(() => fetchComments());
+    .then(() => fetchComments())
+    .catch((error) => {
+      if (error.message === "Failed to fetch") {
+        throw new Error("Failed to fetch");
+      }
+      throw error;
+    });
 }
