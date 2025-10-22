@@ -4,4 +4,8 @@ import { fetchComments } from "./modules/api.js";
 const addButton = document.querySelector(".add-form-button");
 addButton.addEventListener("click", addComment);
 
-fetchComments();
+document.addEventListener("DOMContentLoaded", () => {
+  fetchComments().then(() => {
+    addComment();
+  });
+});

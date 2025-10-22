@@ -27,7 +27,7 @@ export function fetchComments() {
       if (error.message === "Failed to fetch") {
         alert("Проверьте интернет соединение");
       } else {
-        alert("Ошибка загрузки комментариев" + error.message);
+        alert("Ошибка загрузки комментариев: " + error.message);
       }
     });
 }
@@ -38,27 +38,19 @@ export function postComment(name, text) {
     body: JSON.stringify({
       name,
       text,
-      forceError: true,
+      /* forceError: true, */
     }),
-  })
-    .then((response) => {
-      if (!response.ok) {
-        if (response.status === 400) {
-          return response.json().then((err) => {
-            throw new Error("Неккоректный запрос" + err.error);
-          });
-        }
-        if (response.status === 500) {
-          throw new Error("Ошибка сервера");
-        }
+  }).then((response) => {
+    if (!response.ok) {
+      if (response.status === 400) {
+        return response.json().then((err) => {
+          throw new Error("Некорректный запрос: " + err.error);
+        });
       }
-      return response.json();
-    })
-    .then(() => fetchComments())
-    .catch((error) => {
-      if (error.message === "Failed to fetch") {
-        throw new Error("Failed to fetch");
+      if (response.status === 500) {
+        throw new Error("Ошибка сервера");
       }
-      throw error;
-    });
+    }
+    return response.json();
+  });
 }

@@ -1,4 +1,4 @@
-import { postComment } from "./api.js";
+import { postComment, fetchComments } from "./api.js";
 
 export function addComment() {
   const nameInput = document.querySelector(".add-form-name");
@@ -22,12 +22,21 @@ export function addComment() {
       .then(() => {
         nameInput.value = "";
         commentInput.value = "";
+        return fetchComments();
       })
       .catch((error) => {
-        if (error.message === "Ошибка сервера" && attempt < 2) {
-          console.warn("Ошибка 500 — пробуем снова...");
+        if (error.message.includes("Некорректный запрос")) {
+          alert(error.message);
+        } else if (error.message === "Ошибка сервера" && attempt < 2) {
+          console.log("Ошибка 500 — пробуем снова...");
           setTimeout(() => handlePostClick(attempt + 1), 1000);
           return;
+        } else if (error.message === "Ошибка сервера") {
+          alert("Ошибка сервера. Попробуйте позже.");
+        } else if (error.message === "Failed to fetch") {
+          alert("Проверьте интернет соединение");
+        } else {
+          alert("Произошла ошибка: " + error.message);
         }
       })
       .finally(() => {
@@ -35,5 +44,6 @@ export function addComment() {
         submitButton.textContent = "Отправить";
       });
   };
+
   submitButton.addEventListener("click", handlePostClick);
 }
