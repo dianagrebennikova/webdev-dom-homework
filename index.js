@@ -1,11 +1,17 @@
 import { addComment } from "./modules/addComment.js";
 import { fetchComments } from "./modules/api.js";
-
-const addButton = document.querySelector(".add-form-button");
-addButton.addEventListener("click", addComment);
+import { updateComments } from "./modules/commentsArr.js";
+import { renderComments } from "./modules/renderComments.js";
 
 document.addEventListener("DOMContentLoaded", () => {
-  fetchComments().then(() => {
-    addComment();
-  });
+  fetchComments()
+    .then((comments) => {
+      updateComments(comments);
+      renderComments();
+    })
+    .catch((error) => {
+      console.error("Ошибка при загрузке комментариев:", error);
+    });
+
+  addComment();
 });

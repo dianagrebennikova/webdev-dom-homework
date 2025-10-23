@@ -1,6 +1,3 @@
-import { updateComments } from "./commentsArr.js";
-import { renderComments } from "./renderComments.js";
-
 let isFirstLoad = true;
 
 export function fetchComments() {
@@ -19,10 +16,7 @@ export function fetchComments() {
       }
       return response.json();
     })
-    .then((data) => {
-      updateComments(data.comments);
-      renderComments();
-    })
+    .then((data) => data.comments)
     .catch((error) => {
       if (error.message === "Failed to fetch") {
         alert("Проверьте интернет соединение");

@@ -1,4 +1,6 @@
 import { postComment, fetchComments } from "./api.js";
+import { updateComments } from "./commentsArr.js";
+import { renderComments } from "./renderComments.js";
 
 export function addComment() {
   const nameInput = document.querySelector(".add-form-name");
@@ -19,10 +21,12 @@ export function addComment() {
       attempt > 1 ? `Повторная попытка (${attempt})...` : "Отправка...";
 
     postComment(name, comment)
-      .then(() => {
+      .then(() => fetchComments())
+      .then((comments) => {
+        updateComments(comments);
+        renderComments();
         nameInput.value = "";
         commentInput.value = "";
-        return fetchComments();
       })
       .catch((error) => {
         if (error.message.includes("Некорректный запрос")) {
@@ -30,10 +34,9 @@ export function addComment() {
         } else if (error.message === "Ошибка сервера" && attempt < 2) {
           console.log("Ошибка 500 — пробуем снова...");
           setTimeout(() => handlePostClick(attempt + 1), 1000);
-          return;
         } else if (error.message === "Ошибка сервера") {
           alert("Ошибка сервера. Попробуйте позже.");
-        } else if (error.message === "Failed to fetch") {
+        } else if (error.message === "Проверьте интернет соединение") {
           alert("Проверьте интернет соединение");
         } else {
           alert("Произошла ошибка: " + error.message);
