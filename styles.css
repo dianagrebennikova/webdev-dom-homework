@@ -154,3 +154,53 @@ body {
 .add-form-button:hover {
   opacity: 0.9;
 }
+
+.container h1 {
+  margin-bottom: 32px;
+  font-size: 36px;
+}
+
+.login-hint {
+  margin-top: 24px;
+  font-size: 18px;
+}
+
+.login-hint a {
+  color: #bcec30;
+  text-decoration: none;
+}
+
+.login-hint a:hover {
+  text-decoration: underline;
+}
+
+.login-form,
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 300px;
+}
+
+.login-form input,
+.register-form input {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+}
+
+.login-form button,
+.register-form button {
+  padding: 10px;
+  font-size: 18px;
+  background-color: #bcec30;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.login-form button:hover,
+.register-form button:hover {
+  opacity: 0.9;
+}
+
