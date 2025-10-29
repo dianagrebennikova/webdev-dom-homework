@@ -1,4 +1,5 @@
 import { addComment, getComments } from "./api.js";
+import { sanitizeHTML } from "./sanitize.js";
 
 export const renderCommentsPage = async ({ comments, user }) => {
   const app = document.querySelector(".container");
@@ -9,16 +10,50 @@ export const renderCommentsPage = async ({ comments, user }) => {
   commentsList.innerHTML = comments
     .map(
       (c) => `
-      <li class="comment">
+        <li class="comment">
         <div class="comment-header">
-          <div>${c.author.name}</div>
-          <div>${new Date(c.date).toLocaleString()}</div>
+            <div>${c.author.name}</div>
+            <div>${new Date(c.date).toLocaleString()}</div>
         </div>
-        <div class="comment-body">${c.text}</div>
-      </li>`,
+        <div class="comment-body">
+            ${sanitizeHTML(c.text)}
+        </div>
+        <div class="comment-footer">
+            <div class="likes">
+            <span class="likes-counter">${c.likes}</span>
+            <button class="like-button ${c.isLiked ? "-active-like" : ""}"></button>
+            </div>
+        </div>
+        </li>`,
     )
     .join("");
   app.appendChild(commentsList);
+  document.querySelectorAll(".like-button").forEach((button, index) => {
+    button.addEventListener("click", async () => {
+      if (!user) {
+        alert("Авторизуйтесь, чтобы ставить лайки");
+        return;
+      }
+      const comment = comments[index];
+      try {
+        const res = await fetch(
+          `https://wedev-api.sky.pro/api/v2/grebennikova-diana/comments/${comment.id}/toggle-like`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          },
+        );
+        const data = await res.json();
+        comments[index].likes = data.result.likes;
+        comments[index].isLiked = data.result.isLiked;
+        renderCommentsPage({ comments, user });
+      } catch (error) {
+        console.error("Ошибка при лайке:", error);
+      }
+    });
+  });
 
   if (user) {
     const form = document.createElement("div");

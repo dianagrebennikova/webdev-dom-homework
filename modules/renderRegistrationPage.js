@@ -18,6 +18,10 @@ export const renderRegistrationPage = () => {
     const login = e.target.elements.login.value.trim();
     const name = e.target.elements.name.value.trim();
     const password = e.target.elements.password.value.trim();
+    if (!name || !login || !password) {
+      alert("Поля не могут быть пустыми или состоять из пробелов");
+      return;
+    }
     try {
       const user = await registerUser(login, name, password);
       localStorage.setItem("user", JSON.stringify(user));

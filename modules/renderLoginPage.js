@@ -17,6 +17,10 @@ export const renderLoginPage = () => {
     e.preventDefault();
     const login = e.target.elements.login.value.trim();
     const password = e.target.elements.password.value.trim();
+    if (!login || !password) {
+      alert("Введите логин и пароль (не пустые пробелы)");
+      return;
+    }
     try {
       const user = await loginUser(login, password);
       localStorage.setItem("user", JSON.stringify(user));
