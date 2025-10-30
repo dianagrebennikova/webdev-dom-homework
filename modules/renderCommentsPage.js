@@ -1,6 +1,30 @@
 import { addComment, getComments } from "./api.js";
 import { sanitizeHTML } from "./sanitize.js";
 
+function addReplyListeners(user, comments) {
+  const commentInput = document.querySelector(".add-form-text");
+
+  document.querySelectorAll(".comment").forEach((commentEl) => {
+    commentEl.addEventListener("click", () => {
+      if (!user) {
+        alert("Авторизуйтесь, чтобы отвечать на комментарии");
+        return;
+      }
+
+      const index = commentEl.dataset.index;
+      const comment = comments[index];
+
+      commentInput.value = `Ответ на комментарий: ${comment.author.name}: ${comment.text}\n`;
+      commentInput.dataset.replyTo = comment.id;
+
+      commentInput.focus();
+
+      commentInput.selectionStart = commentInput.selectionEnd =
+        commentInput.value.length;
+    });
+  });
+}
+
 export const renderCommentsPage = async ({ comments, user }) => {
   const app = document.querySelector(".container");
   app.innerHTML = `<h1>Лента комментариев</h1>`;
@@ -9,31 +33,34 @@ export const renderCommentsPage = async ({ comments, user }) => {
   commentsList.className = "comments";
   commentsList.innerHTML = comments
     .map(
-      (c) => `
-        <li class="comment">
-        <div class="comment-header">
-            <div>${c.author.name}</div>
-            <div>${new Date(c.date).toLocaleString()}</div>
-        </div>
-        <div class="comment-body">
-            ${sanitizeHTML(c.text)}
-        </div>
-        <div class="comment-footer">
-            <div class="likes">
-            <span class="likes-counter">${c.likes}</span>
-            <button class="like-button ${c.isLiked ? "-active-like" : ""}"></button>
-            </div>
-        </div>
+      (c, index) => `
+        <li class="comment" data-index="${index}">
+          <div class="comment-header">
+              <div>${sanitizeHTML(c.author.name)}</div>
+              <div>${new Date(c.date).toLocaleString()}</div>
+          </div>
+          <div class="comment-body">
+              ${sanitizeHTML(c.text)}
+          </div>
+          <div class="comment-footer">
+              <div class="likes">
+              <span class="likes-counter">${c.likes}</span>
+              <button class="like-button ${c.isLiked ? "-active-like" : ""}"></button>
+              </div>
+          </div>
         </li>`,
     )
     .join("");
   app.appendChild(commentsList);
+
   document.querySelectorAll(".like-button").forEach((button, index) => {
-    button.addEventListener("click", async () => {
+    button.addEventListener("click", async (e) => {
+      e.stopPropagation();
       if (!user) {
         alert("Авторизуйтесь, чтобы ставить лайки");
         return;
       }
+
       const comment = comments[index];
       try {
         const res = await fetch(
@@ -59,7 +86,7 @@ export const renderCommentsPage = async ({ comments, user }) => {
     const form = document.createElement("div");
     form.className = "add-form";
     form.innerHTML = `
-      <input type="text" class="add-form-name" value="${user.name}" readonly />
+      <input type="text" class="add-form-name" value="${sanitizeHTML(user.name)}" readonly />
       <textarea class="add-form-text" placeholder="Введите комментарий" rows="4"></textarea>
       <div class="add-form-row">
         <button class="add-form-button">Отправить</button>
@@ -77,9 +104,13 @@ export const renderCommentsPage = async ({ comments, user }) => {
         return;
       }
 
+      const parentId = commentInput.dataset.replyTo || null;
+
       try {
-        await addComment({ text, token: user.token });
+        await addComment({ text, parentId, token: user.token });
         commentInput.value = "";
+        commentInput.dataset.replyTo = "";
+
         const updatedComments = await getComments(user.token);
         renderCommentsPage({ comments: updatedComments, user });
       } catch (err) {
@@ -98,4 +129,5 @@ export const renderCommentsPage = async ({ comments, user }) => {
       import("./renderLoginPage.js").then((module) => module.renderLoginPage());
     });
   }
+  addReplyListeners(user, comments);
 };
