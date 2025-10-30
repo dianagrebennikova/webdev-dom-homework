@@ -1,50 +1,25 @@
-let isFirstLoad = true;
+const personalKey = "grebennikova-diana";
+const baseUrl = `https://wedev-api.sky.pro/api/v2/${personalKey}/comments`;
 
-export function fetchComments() {
-  if (isFirstLoad) {
-    const commentsList = document.querySelector(".comments");
-    commentsList.innerHTML = `<li>Загрузка комментариев...</li>`;
-    isFirstLoad = false;
-  }
-
-  return fetch("https://wedev-api.sky.pro/api/v1/grebennikova-diana/comments")
-    .then((response) => {
-      if (!response.ok) {
-        if (response.status >= 500) {
-          throw new Error("Ошибка сервера. Попробуйте позже");
-        }
-      }
-      return response.json();
-    })
-    .then((data) => data.comments)
-    .catch((error) => {
-      if (error.message === "Failed to fetch") {
-        alert("Проверьте интернет соединение");
-      } else {
-        alert("Ошибка загрузки комментариев: " + error.message);
-      }
-    });
-}
-
-export function postComment(name, text) {
-  return fetch("https://wedev-api.sky.pro/api/v1/grebennikova-diana/comments", {
-    method: "POST",
-    body: JSON.stringify({
-      name,
-      text,
-      /* forceError: true, */
-    }),
-  }).then((response) => {
-    if (!response.ok) {
-      if (response.status === 400) {
-        return response.json().then((err) => {
-          throw new Error("Некорректный запрос: " + err.error);
-        });
-      }
-      if (response.status === 500) {
-        throw new Error("Ошибка сервера");
-      }
-    }
-    return response.json();
+export const getComments = async (token) => {
+  const response = await fetch(baseUrl, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
-}
+  if (!response.ok) throw new Error("Не удалось загрузить комментарии");
+  const data = await response.json();
+  return data.comments;
+};
+
+export const addComment = async ({ text, token }) => {
+  const response = await fetch(baseUrl, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ text }),
+  });
+
+  if (!response.ok) {
+    const err = await response.json();
+    throw new Error(err.error || "Ошибка при добавлении комментария");
+  }
+  return response.json();
+};
